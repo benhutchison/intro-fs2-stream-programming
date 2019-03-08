@@ -32,39 +32,39 @@ without making an observable difference to the world. This property is called *r
 
 The term *pure* is often used to describe functions that are *referentially transparent*; the meanings are equivalent.
 
-### Quiz1: Which of the methods on the `Quiz1` object are pure functions?
+### Quiz: Which of the methods in the examples below are pure functions?
+
 ```scala mdoc
 object Q1 {
+
   def head[T](l: List[T]): T = l.head
 
   def headOption[T](l: List[T]): Option[T] = l.headOption
-
 }
+```
+
+<details><summary>Q1 Answer</summary><p>
+
+`head`: Impure. Can have the effect of throwing an exception rather than returning a value of type `T`.
+
+`headOption`: Pure.
+
+</p></details>
+
+
+```scala mdoc
 class Q2[T](l: List[T]) {
 
     def unCons: (Option[T], Q2[T]) = l match {
       case h :: t => (Some(h), new Q2(t))
       case nil => (None, new Q2(nil))
     }
-
 }
 ```
 
-<details>
-<summary>Quiz 1 Answers</summary>
-<p>
-#### Q1
-
-`head`: Impure. Can have the effect of throwing an exception rather than returning a value of type `T`.
-
-`headOption`: Pure.
-
-#### Q2
+<details><summary>Q2 Answer</summary><p>
 
 `unCons`: Pure. When object-oriented syntax is desugared, there's an extra `this` parameter passed to every method. So
 the use of the class field `l` is actually via a hidden parameter.
 
-
-</p>
-</details>
-
+</p></details>
