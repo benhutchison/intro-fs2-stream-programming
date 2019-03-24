@@ -129,12 +129,12 @@ We saw earlier that functions can have zero to N parameters. Currying is a trans
 function of *multiple* parameters into a function with a *single* parameter. The way a curried function works is that it
 accepts the first parameter, then returns a function accepting the remaining parameters.
 
-````scala mdoc
+```scala mdoc
 object Currying {
 
-  val function2Params = (n: Int, l: List[String]) => Option[String] = l.get(n)
+  val function2Params: (Int, List[String]) => Option[String] = (n, l) => l.lift(n)
 
-  val curried: Int => (List[String] => String) = (n: Int) => function2Params(n, _)
+  val curried: Int => (List[String] => Option[String]) = (n: Int) => function2Params(n, _)
 }
 ```
 If unfamiliar, the underscore `_` in the example above converts the `function2Params(n, _)` into an anonymous function
@@ -143,12 +143,12 @@ of one parameter to "fill the hole", ie with a parameter of type `List[String]`
 Currying in simply a mechanical transformation, that lets us feed a function its parameters in stages. We can also provide
 parameters "out of order" easily.
 
-````scala mdoc
+```scala mdoc
 object OutOfOrder {
 
-  val function2Params = (n: Int, l: List[String]) => Option[String] = l.get(n)
+  val function2Params: (Int, List[String]) => Option[String] = (n, l) => l.lift(n)
 
-  val outOfOrder: List[String] => (Int => String) = (l: List[String]) => function2Params(_, l)
+  val outOfOrder: List[String] => (Int => Option[String]) = (l: List[String]) => function2Params(_, l)
 }
 ```
 
@@ -236,22 +236,90 @@ surrounded by a thin effectful rind or skin.
 
 ### Example: Refactoring Effects to the Edge
 
-```scala mdoc
+[Edit on Scala Fiddle](https://scalafiddle.io/sf/xdwyVXW/0)
+
+```scala mdoc:reset
+import collection.mutable.ArrayBuffer
+
+case class Website(ads: ArrayBuffer[Ad] = ArrayBuffer.empty)
+
 object Website {
 
-  def buyAd(text: String, cc: CreditCard): Ad = {
+  def buyAd(text: String)(site: Website, cc: CreditCard) = {
     val ad = new Ad(text)
+    site.ads += ad
     cc.charge(ad.price)
-    ad
   }
 }
 //CreditCard contains a mutable balance, so the charge operation causes side-effects
-class CreditCard(var balance) {
+case class CreditCard(id: Long, var balanceOwing: Int) {
 
-  def charge(amount: BigDecimal) = balance -= amount
+  def charge(amount: Int) = balanceOwing += amount
 }
-case class Ad(text: String)
+case class Ad(text: String) {
+
+  def price = 10 + math.min(text.length, 40)
+}
+
+object ImperativeMain {
+
+  def main() = {
+    val site = Website()
+    val cc = CreditCard(1111222233334444L, 0)
+    Website.buyAd("Functional Programming is cool!")(site, cc)
+    printStatus(site, cc)
+  }
+
+  def printStatus(site: Website, cc: CreditCard) =
+    println(s"After purchase, I have ${cc.balanceOwing} owing on my card. There are ${site.ads.size} on site.")
+}
 ```
+
+</div>
+
+
+#### Sample Solution
+
+<details>
+
+Note: the `tupled` operator below mechnically transforms a functions parameter list from accepting N parameters to accepting
+one parameter, an N-tuple of the same types as the original.
+
+```scala mdoc:reset
+case class Website(ads: List[Ad] = List.empty[Ad])
+
+object Website {
+
+   def buyAd(text: String, site: Website, cc: CreditCard): (Website, CreditCard) = {
+    val ad = new Ad(text)
+    (site.copy(ads = site.ads :+ ad), cc.charge(ad.price))
+  }
+}
+
+case class CreditCard(id: Long, val balanceOwing: Int) {
+
+  def charge(amount: Int) = copy(balanceOwing = this.balanceOwing + amount)
+}
+case class Ad(text: String) {
+
+  def price = 10 + math.min(text.length, 40)
+}
+
+object FunctionalMain {
+
+  //we still have side-effects and mutable state, but they are confined to the top-level, ie `main`
+  def main() = {
+    var appState = (Website(), CreditCard(1111222233334444L, 0))
+    appState = Website.buyAd("Functional Programming is cool!", appState._1, appState._2)
+    println(status(appState._1, appState._2))
+  }
+
+  def status(site: Website, cc: CreditCard) =
+      s"After purchase, I have ${cc.balanceOwing} owing on my card. There are ${site.ads.size} on site."
+}
+```
+
+</details>
 
 
 
