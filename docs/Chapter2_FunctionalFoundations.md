@@ -234,9 +234,12 @@ So functional programming isn't so much about avoiding side-effects as it is abo
 aspects of our program into two distinct phases. A functional program has been likened to a fruit, with a pure interior
 surrounded by a thin effectful rind or skin.
 
-### Example: Refactoring Effects to the Edge
+### Exercise: Refactoring Effects to the Edge
 
-[Edit on Scala Fiddle](https://scalafiddle.io/sf/xdwyVXW/0)
+In this exercise, I encourage you to try applying the ideas above by refactoring this program to move all the effects
+to the `main` method, leaving the remainder of the program pure and free of mutable state.
+
+[Edit on Scala Fiddle (advise open in new tab)](https://scalafiddle.io/sf/xdwyVXW/0)
 
 ```scala mdoc:reset
 import collection.mutable.ArrayBuffer
@@ -320,6 +323,30 @@ object FunctionalMain {
 ```
 
 </details>
+
+## Cats IO: A building block effect
+
+`IO` is effect abstraction provided by the [`Cats Effect`]() that we'll use heavily in the remainder of this tutorial.
+
+We use `IO` by wrapping it around code that causes side-effects, such as read- or write- io, or accessing the system clock,
+or mutating an externally visible variable. `IO` *suspends* the wrapped code, meaning that it get's stored up as a runnable
+value but doesn't run when created. Whatever value the wrapped expression returns, call it `A`, becomes the value of the
+IO, ie `IO[A]`. So for example, an `IO` action that effectfully reads bytes off the network might return `IO[Array[Byte]]`,
+being the data read when it is finally run.
+
+`IO` has a monad defined, so we can chain together `IO`s, feeding the result of one into the input of the next. It also
+provides operations for launching two `IO` actions concurrently and waiting for one or all of them to complete. The intent
+is that we build up a description of all the effectful actions in our program as a graph of `IO` values, which is a pure
+computation, and then set run running at the end with an operation like [`unsafeRunSync`](), which starts them running.
+
+The `unsafe` prefix is not intended to imply the method shouldn't be called, but rather to alert programmers that when
+called they are leaving the pure world and actually causing effects.
+
+`IO` has some built in error handling, because effectful code can of course throw runtime exceptions. So an `IO[A]` should
+yield an `A` but may alternately yield an exception when run.
+
+TODO Cats IO Examples
+
 
 
 
