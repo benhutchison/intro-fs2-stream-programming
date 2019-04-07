@@ -9,4 +9,10 @@ lazy val docs = project
   .dependsOn(root)
   .enablePlugins(MdocPlugin)
   .settings(Seq(
+    libraryDependencies ++= Seq(
+      "org.typelevel" %% "cats-core" % "1.6.0",
+      "org.typelevel" %% "cats-effect" % "1.2.0",
+      "co.fs2" %% "fs2-core" % "1.0.4",
+      "co.fs2" %% "fs2-io" % "1.0.4",
+    ),
   ))

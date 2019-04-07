@@ -326,7 +326,8 @@ object FunctionalMain {
 
 ## Cats IO: A building block effect
 
-`IO` is effect abstraction provided by the [`Cats Effect`]() that we'll use heavily in the remainder of this tutorial.
+`IO` is effect abstraction provided by the [`Cats Effect`](https://typelevel.org/cats-effect/) that we'll use heavily in
+the remainder of this tutorial.
 
 We use `IO` by wrapping it around code that causes side-effects, such as read- or write- io, or accessing the system clock,
 or mutating an externally visible variable. `IO` *suspends* the wrapped code, meaning that it get's stored up as a runnable
@@ -334,10 +335,35 @@ value but doesn't run when created. Whatever value the wrapped expression return
 IO, ie `IO[A]`. So for example, an `IO` action that effectfully reads bytes off the network might return `IO[Array[Byte]]`,
 being the data read when it is finally run.
 
+```scala mdoc
+import cats.effect.IO
+import cats.implicits._
+
+object RunIO {
+    val program = IO(println("Hello World"))
+
+    program.unsafeRunSync
+}
+```
+
 `IO` has a monad defined, so we can chain together `IO`s, feeding the result of one into the input of the next. It also
 provides operations for launching two `IO` actions concurrently and waiting for one or all of them to complete. The intent
 is that we build up a description of all the effectful actions in our program as a graph of `IO` values, which is a pure
-computation, and then set run running at the end with an operation like [`unsafeRunSync`](), which starts them running.
+computation, and then set run running at the end with an operation like [`unsafeRunSync`](https://typelevel.org/cats-effect/datatypes/io.html#unsaferunsync),
+which starts them running.
+
+//TODO when the sbt mdoc task is run, it blocks on the readLine. Fix this
+```scala mdoc
+object SequencingIO {
+    val prompt = IO(println("Enter your name"))
+
+    val readName: IO[String] = IO(scala.io.StdIn.readLine)
+
+    val greeting = (name: String) => IO(println(s"Hello $name"))
+
+    prompt.>>(readName).>>=(greeting).unsafeRunSync
+}
+```
 
 The `unsafe` prefix is not intended to imply the method shouldn't be called, but rather to alert programmers that when
 called they are leaving the pure world and actually causing effects.
@@ -345,8 +371,17 @@ called they are leaving the pure world and actually causing effects.
 `IO` has some built in error handling, because effectful code can of course throw runtime exceptions. So an `IO[A]` should
 yield an `A` but may alternately yield an exception when run.
 
-TODO Cats IO Examples
+```scala mdoc
+object ErrorsAndIO {
+    val errorProgram = IO(throw new RuntimeException("Boom!"))
 
+    //swallows the exception by translating to the Unit value
+    errorProgram.handleError(ex => ()).unsafeRunSync
+
+    //throws the exception because it's unhandled
+    errorProgram.unsafeRunSync
+}
+```
 
 
 
