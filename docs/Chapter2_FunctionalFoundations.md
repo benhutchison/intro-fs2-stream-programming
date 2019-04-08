@@ -368,6 +368,96 @@ object SequencingIO {
 The `unsafe` prefix is not intended to imply the method shouldn't be called, but rather to alert programmers that when
 called they are leaving the pure world and actually causing effects.
 
+The above example uses the [`>>`](https://github.com/typelevel/cats/blob/e1a7cfcddce0/core/src/main/scala/cats/syntax/flatMap.scala#L33)
+operator, which is used to sequence an 'IO' action that doesn't receive any parameters
+from the preceding ones (`readName` here). `>>(action)` is an alias for `flatMap(_ => action)`, and requires the import
+of Cats library "syntax" (similar concept to "extension methods" in other languages) enabled by
+[`import cats.implicits._`](https://typelevel.org/cats/typeclasses/imports.html).
+`>>=` is an operator alias of `flatMap` to sequence an action that *does* require a parameter passed from the previous action
+(the greeting string in the above example).
+
+### Exercise: IO Sequencing
+
+See it, Do it. The example below and linked ScalaFiddle contain three program parts which you need to compose.
+- An action that reads the current time as a timestamp.
+- An action that nice formats a timestamp into a string.
+- An action that prints a time string
+
+There are two syntactic styles you can use. Attempt the exercise in both styles to develop your intuition as to their
+underlying equivalence despite superficial differences.
+- `map` and `flatMap` invocations, the desugared representation
+- A for-yield expression
+
+
+#### Sample Solutions
+
+```scala mdoc:reset
+import cats.effect._
+import cats.implicits._
+
+object IOExercise extends App {
+  val timestamp = IO(System.currentTimeMillis)
+
+  val formatTime = (t: Long) => IO(new java.text.SimpleDateFormat("yyyy-MM-dd HH").format(new java.util.Date(t)))
+
+  val printTimeMsg = (s: String) => IO(s"The clock in the executing computer says time is $s")
+
+  val program: IO[Unit] = ???
+
+  program.unsafeRunSync
+
+}
+```
+
+<details>
+
+```scala mdoc:reset
+import cats.effect._
+import cats.implicits._
+
+object IOExercise extends App {
+  val timestamp = IO(System.currentTimeMillis)
+
+  val formatTime = (t: Long) => new java.text.SimpleDateFormat("yyyy-MM-dd HH").format(new java.util.Date(t))
+
+  val printTimeMsg = (s: String) => IO(println(s"The clock in the executing computer says time is $s"))
+
+  val program: IO[Unit] = timestamp.map(formatTime).flatMap(printTimeMsg)
+
+  program.unsafeRunSync
+
+}
+```
+
+With for syntax:
+
+
+```scala mdoc:reset
+import cats.effect._
+import cats.implicits._
+
+object IOExercise extends App {
+  val timestamp = IO(System.currentTimeMillis)
+
+  val formatTime = (t: Long) => new java.text.SimpleDateFormat("yyyy-MM-dd HH").format(new java.util.Date(t))
+
+  val printTimeMsg = (s: String) => IO(println(s"The clock in the executing computer says time is $s"))
+
+  val program: IO[Unit] = for {
+    t <- timestamp
+    s = formatTime(t)
+    _ <- printTimeMsg(s)
+  } yield (())
+
+  program.unsafeRunSync
+
+}
+```
+
+
+
+</details>
+
 `IO` has some built in error handling, because effectful code can of course throw runtime exceptions. So an `IO[A]` should
 yield an `A` but may alternately yield an exception when run.
 
