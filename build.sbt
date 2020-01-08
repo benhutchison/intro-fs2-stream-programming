@@ -1,6 +1,6 @@
 name := "Introduction to Stream Oriented Programming in Scala with FS2"
 
-scalaVersion := "2.12.8"
+scalaVersion in ThisBuild := "2.13.1"
 
 lazy val root = project.in(file("."))  // your existing library
 
@@ -10,9 +10,9 @@ lazy val docs = project
   .enablePlugins(MdocPlugin)
   .settings(Seq(
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core" % "1.6.0",
-      "org.typelevel" %% "cats-effect" % "1.2.0",
-      "co.fs2" %% "fs2-core" % "1.0.4",
-      "co.fs2" %% "fs2-io" % "1.0.4",
+      "org.typelevel" %% "cats-core" % "2.1.0",
+      "org.typelevel" %% "cats-effect" % "2.0.0",
+      "co.fs2" %% "fs2-core" % "2.1.0",
+      "co.fs2" %% "fs2-io" % "2.1.0",
     ),
   ))
