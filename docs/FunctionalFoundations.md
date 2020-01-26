@@ -1,13 +1,14 @@
+---
+layout: page
+title:  "Functional Foundations"
+section: "Functional Foundations"
+position: 3
+---
 <script defer src="https://embed.scalafiddle.io/integration.js"></script>
 
 # Functional Programming Foundations
 
-Functional Programming (FP) is a programming style emphasising the use of *functions*. Stream-oriented FP, which
-is the topic of this workshop, additionally emphasises *streams* to represent computations that repeat multiple times,
-typically either because we need to do a similar task for different data items, or perform a similar task at different
-times.
-
-Before introducing streams, we'll start with the general foundation concepts of functional programming.
+Functional Programming (FP) is a programming style emphasising the use of *functions.
 
 ## Functions
 
@@ -237,17 +238,30 @@ object Currying {
 If unfamiliar, the underscore `_` in the example above converts the `function2Params(n, _)` into an anonymous function
 of one parameter to "fill the hole", ie with a parameter of type `List[String]`
 
-Currying in simply a mechanical transformation, that lets us feed a function its parameters in stages. We can also provide
-parameters "out of order" easily.
+Currying in simply a mechanical transformation, that lets us feed a function its parameters in stages. We can also used
+currying to change the order we provide parameters in.
 
+Exercise: Implement `itemsIn` in terms of `getItem` to re-order parameters.
+{% scalafiddle %}
 ```scala:mdoc
 object OutOfOrder {
 
-  val function2Params: (Int, List[String]) => Option[String] = (n, l) => l.lift(n)
+  val getItem: (Int, List[String]) => Option[String] = (n, l) => l.lift(n)
 
-  val outOfOrder: List[String] => (Int => Option[String]) = (l: List[String]) => function2Params(_, l)
+  val itemsIn: List[String] => (Int => Option[String]) = ???
 }
 ```
+{% endscalafiddle %}
 
-The takeaway is that the number and ordering of function parameters is a matter of syntactic convenience, and can
-always be changed if desired by means of mechanical transformations, without changing the meaning of a program.
+<details><summary>Solution</summary><p>
+```scala:mdoc
+object OutOfOrder {
+
+  val getItem: (Int, List[String]) => Option[String] = (n, l) => l.lift(n)
+
+  val itemsIn: List[String] => (Int => Option[String]) = (l: List[String]) => getItem(_, l)
+}
+</p></details>
+
+The number and ordering of function parameters is a matter of syntactic convenience, and can
+always be changed when desired by mechanical transformations, without changing the meaning of a program.

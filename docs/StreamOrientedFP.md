@@ -1,8 +1,16 @@
+---
+layout: page
+title:  "Streams"
+section:  "Streams"
+position: 6
+---
+<script defer src="https://embed.scalafiddle.io/integration.js"></script>
+
 # Stream Oriented Functional Programming
 
 ## Are Functions Enough?
 
-In [FunctionalFoundations](./Chapter2_FunctionalFoundations.md) we learned that functional programs that cause effects
+In [FunctionalFoundations](./FunctionalFoundations.md) we learned that functional programs that cause effects
 are structured as a pure computation that yields an effectful action, which is constructed and then set running at the
 end of the program.
 

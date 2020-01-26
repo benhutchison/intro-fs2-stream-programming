@@ -1,3 +1,11 @@
+---
+layout: page
+section:  "Static Typing"
+title:  "Static Typing"
+position: 4
+---
+<script defer src="https://embed.scalafiddle.io/integration.js"></script>
+
 ## Statically Typed Functional Programming
 
 This workshop teaches *statically typed* functional programming. Static typing classifies all the *terms* (ie data

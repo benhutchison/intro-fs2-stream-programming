@@ -1,3 +1,10 @@
+---
+layout: page
+title:  "Warmup with Option"
+section: "Warmup with Option"
+position: 2
+---
+
 <script defer src="https://embed.scalafiddle.io/integration.js"></script>
 
 # Warm Up: Why Option is better than null
@@ -103,7 +110,7 @@ worrying about the `None` case.
 
 Use Option chaining to implement `estimateDelivery`:
 
-<div data-scalafiddle>
+{% scalafiddle %}
 ```scala mdoc:reset
 object OptionExercise {
   case class UserProfile(postcode: Option[String])
@@ -119,8 +126,9 @@ object OptionExercise {
   //use flatMap and map
   def estimateDelivery: BigDecimal = ???
 }
+assert(OptionExercise.estimateDelivery = BigDecimal("15.00"))
 ```
-</div>
+{% endscalafiddle %}
 
 ## For Expressions
 
@@ -143,7 +151,7 @@ object ForTwiceSquareRoot {
 }
 ```
 
-The intuition behind the for expression is that the expressions on the righthand side (eg ` args.lift(0)`) are all `Option`s
+The intuition behind the for expression is that the expressions on the righthand side (eg `args.lift(0)` ) are all `Option`s
 of some form. The arrow `<-` "pulls" the payload out of the option, if its non-empty, and assigns it to the name on the left
 (eg `arg`), where it can be referred by any subsequent line in the expression.
 
@@ -154,9 +162,9 @@ the overall value. But otherwise, whatever expression is in the `yield` block is
 
 Same business logic as the previous exercise, but write it using a for-expression
 
-<div data-scalafiddle>
+{% scalafiddle %}
 ```scala mdoc:reset
-object OptionExercise2 {
+object OptionExercise {
   case class UserProfile(postcode: Option[String])
 
   def loggedInUser: Option[UserProfile] = Some(UserProfile(Some("3000")))
@@ -168,8 +176,9 @@ object OptionExercise2 {
 
   def estimateDelivery: BigDecimal = ???
 }
+assert(OptionExercise.estimateDelivery = BigDecimal("15.00"))
 ```
-</div>
+{% endscalafiddle %}
 
 ## Monads
 

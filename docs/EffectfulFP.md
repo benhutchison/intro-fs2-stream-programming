@@ -1,3 +1,11 @@
+---
+layout: page
+title:  "Effects"
+section:  "Effects"
+position: 5
+---
+<script defer src="https://embed.scalafiddle.io/integration.js"></script>
+
 ## Effects
 
 Lets look now at how we build functional programs that do have effects on the outside world.
@@ -114,6 +122,8 @@ or mutating an externally visible variable. `IO` *suspends* the wrapped code, me
 value but doesn't run when created. Whatever value the wrapped expression returns, call it `A`, becomes the value of the
 IO, ie `IO[A]`. So for example, an `IO` action that effectfully reads bytes off the network might return `IO[Array[Byte]]`,
 being the data read when it is finally run.
+
+
 
 ```scala mdoc
 import cats.effect.IO
