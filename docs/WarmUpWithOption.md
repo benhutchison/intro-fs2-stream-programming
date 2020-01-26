@@ -1,14 +1,16 @@
+<script defer src="https://embed.scalafiddle.io/integration.js"></script>
+
 # Warm Up: Why Option is better than null
 
 This short chapter consists of a warmup exercise to introduce Scala syntax, but we are also going to address an important
 question: "just why is Scala's `Option` better than using null?" as is common in Java, C# and Ruby.
 
-Along the road, we'll find ourselves discovering monads and some sense of their place in functional programming.
+Along the road, we'll encounter monads and get a sense of their place in functional programming.
 
 ## Introducing Option
 
 `Option[A]` is abstraction defined in the Scala standard library that represents a value `A` that may or may not be present.
-It models some uncertainty the program has about whether this `A` value is defined.
+It models some uncertainty (or non-determinism) the program has about whether this `A` value is defined.
 
 Option is a polymorphic ('many formed') or generic type, in that it accepts another type A, which can be anything, defining
 the value it holds. In many other languages it would be written `Option<A>', but Scala uses square brackets `[ ]`  to denote
@@ -51,19 +53,24 @@ def parseArg(s: Option[String]): Option[Int] = {
 }
 ```
 
-## Why Option is better than null: Chaining Optional Computations
+**❓Quiz: Is Option actually better than `null`?**  The above code is structurally
+similar to the `if (arg != null) ... else ...` patterns used to handle `null`s in C# or Java, in that there's branch to
+handle the non-empty case and another to handle the empty one. Are the benefits of Option over null just superficial?
 
-Some programmers coming from null-centric languages like Java or C# have pointed out that that above code is structurally
-similar to the `if (arg != null) ... else ...` patterns used to handle `null`s, in that there are two branches, and for
-that reason questioned how much value using `Option`s adds.
 
+<details><summary>Options Benefits</summary><p>
 The first tier benefit is explictness of intent: by using Options consistently in Scala, the type system forces users of
-a value to consider how they will handle the empty case. This benefit is widely recognized, and there is comparable support
-in C#, Typescript, Swift and Kotlin.
+a value to consider how they will handle the empty case.
 
-But there is a second tier benefit which it is important to understand in order to become Scala fluent: it turns out that
-we can "factor-out" the code that handles the empty case into the library, and mostly just talk about the non-empty case
-in our application code. Lets have a look at how that works:
+There's also a more subtle second tier benefit when Options are composed together; we'll study it in the next section
+</p></details>
+
+## Chaining Optional Computations
+
+It turns out that we can "factor-out" the code paths that handles the empty case into the Option library, and mostly just
+talk about  the non-empty case in our application code.
+
+Lets have a look at how that works:
 
 ```scala:mdoc
 //cant represent square root of a negative number as a Double value
@@ -92,6 +99,29 @@ we'll end up with an `Option[Double]` in the end.
 Similarly, the `map` method on Option also runs only when it's defined, letting us double the optional number without
 worrying about the `None` case.
 
+### Exercise
+
+Use Option chaining to implement `estimateDelivery`:
+
+<div data-scalafiddle>
+```scala mdoc:reset
+object OptionExercise {
+  case class UserProfile(postcode: Option[String])
+
+  def loggedInUser: Option[UserProfile] = Some(UserProfile(Some("3000")))
+
+  def deliveryEstimate(postcode: String): Option[BigDecimal] =
+    Map("3000" -> BigDecimal("15.00"), "2000" ->  BigDecimal("20.00")).get(postcode)
+
+  val unknownPostcodeEstimate = 25.0
+
+  //Estimate delivery for the current logged in user's postcode, `orElse` use the `unknownPostcodeEstimate`
+  //use flatMap and map
+  def estimateDelivery: BigDecimal = ???
+}
+```
+</div>
+
 ## For Expressions
 
 This pattern of chaining a pipeline of transformations over optional values together is common in applied scala code. In
@@ -119,6 +149,27 @@ of some form. The arrow `<-` "pulls" the payload out of the option, if its non-e
 
 As soon as any expression on the right is empty (`None`), the whole for-expression "short-circuits" and yields `None` as
 the overall value. But otherwise, whatever expression is in the `yield` block is returned, wrapped inside an `Option`.
+
+### Exercise
+
+Same business logic as the previous exercise, but write it using a for-expression
+
+<div data-scalafiddle>
+```scala mdoc:reset
+object OptionExercise2 {
+  case class UserProfile(postcode: Option[String])
+
+  def loggedInUser: Option[UserProfile] = Some(UserProfile(Some("3000")))
+
+  def deliveryEstimate(postcode: String): Option[BigDecimal] =
+   Map("3000" -> BigDecimal("15.00"), "2000" ->  BigDecimal("20.00")).get(postcode)
+
+  val unknownPostcodeEstimate = 25.0
+
+  def estimateDelivery: BigDecimal = ???
+}
+```
+</div>
 
 ## Monads
 
