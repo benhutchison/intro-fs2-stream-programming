@@ -16,6 +16,7 @@ In FP, functions are defined similarly to mathematics:
 
 - They may have a name, or they may be anonymous, being defined inline at the point where they're used. Anonymous functions
 are called "lambda expressions".
+
 ```scala:mdoc
 object SquareExample {
   //define a named function
@@ -41,9 +42,10 @@ object ArityExample {
 ```
 
 - They compute one result- or return- value. Multiple values can be returned by placing them into a pair or tuple.
- There's also a special singleton ("unique") value called `Unit` that's conceptually
-returned by functions that don't compute any result (analogous to void in Java/C##/C ). Slightly confusingly, in Scala
-the unit value is written as a bracket pair.
+There's also a special singleton ("unique") value called `Unit` that's conceptually returned by functions that don't
+compute any result (analogous to void in Java/C##/C ). Slightly confusingly, in Scala the unit value is written as a
+bracket pair.
+
 ```scala:mdoc
 object ReturnExample {
 

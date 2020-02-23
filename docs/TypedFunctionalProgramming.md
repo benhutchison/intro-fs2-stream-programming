@@ -68,3 +68,83 @@ object UseEitherNotExceptions {
 
 The key objection to using exceptions in FP is that it requires jumping into a special execution mode with different semantics,
 and it turns out to be just as easily handled within the standard FP model using `Either` and related concepts.
+
+### Polymorphic Types & Type Parameters
+
+In the chapter [WarmUpWithOption](./WarmUpWithOption.md) we looked at `Option` but we didn't focus on 
+its type-polymorphic nature or the mechanics of the type parameter `[A]`. 
+
+Review the definition of `Option`: 
+
+```scala:mdoc
+sealed trait Option[A]
+
+case class Some[A](a: A) extends Option[A]
+
+case object None extends Option[Nothing]
+```
+
+This is a *polymorphic* data-type; "many shaped" (also called "generic" in other languages). It optionally holds a 
+value of type `A` but the type `A` can be  differ at each instantiation of the Option. That is we might have an 
+`Option[Int]` and an `Option[String]` in the same  program or even expression. They both have the optional behavior 
+of option, but the payload type differs. Polymorphic data types are useful because they let us write reuseable code 
+that works for many different types of data.
+
+As well as data types, methods can be polymorphic. Here's an example of how methods can do useful work even when the 
+specific data they are handling isn't known:
+
+```scala:mdoc
+def orElse[T](planA: Option[T], planB: Option[T]): Option[T] = planA match {
+  case Some(_) => planA
+  case None => planB
+}
+```
+
+The use of single capital letters for type parameters is merely a convention. We can have any number of type 
+parameters. Here's an example of a polymorphic method with type type parameters that ignores the capital letter 
+convention. It optionally returns both inputs if and only if they are both defined:
+
+```scala:mdoc
+def tuple[A, B](a: Option[A], b: Option[B]): Option[(A, B)] = (a, b) match {
+  case (Some(a), Some(b)) => Some((a, b))
+  case _ => None
+}
+```
+
+It turns out to be a useful method we'll meet (and generalize) again later.
+
+
+### Type Parameters
+
+So methods and constructors take both type and value parameters; the former in square brackets and the latter in 
+round brackets. The value parameters and body of the method can refer to type parameters.
+
+Despite the symmetry, be sure to clearly understand how type and value parameters differ.
+- Type parameters are passed or inferred at every call-site (ie code location) of a method and every instantiation of a 
+data type. This happens at *compile-time* ie while the code is being compiled. 
+- Value parameters are passed every time a method is invoked at *runtime*. The same call site can be invoked many times 
+(eg in a loop) or that call site might never be invoked during the program's execution.
+
+Type parameters are commonly left to the compiler to infer. For example, in the expression `Some(a)` from the 
+example above, the type parameter `A` is inferred from context and not explicitly written. Expanded it looks like 
+`Some[A](a)` but that gets boring quickly. 
+
+It's worth noting that Scala also has an important mechanism to *infer value parameters* passed at runtime by matching 
+the type of the parameter with the type of values in the surrounding scope. Such inferred parameters are called 
+`implicit` and we'll cover them in the next chapter. 
+
+### Higher-Kinded Types
+
+We saw how `Option` be parameterised with a payload type to yield a type like `Option[Int]`. But does it make sense 
+to talk about the type `Option` independent of any specific parameter? 
+
+We can describe the general `Option` type as a family of related types that:
+- Accept a single type parameter, being their payload 
+- May or may not hold a single value of the payload
+
+Types like `Option` (or `List`, or `Future`) are termed *higher-kinded* types, or alternately *type constructors*. It
+ turns out to be useful to represent higher-kinded types in programming. Later chapters use them extensively so we'll
+ leave the examples until then.
+
+### Partially Applied Types
+

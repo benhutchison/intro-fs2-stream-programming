@@ -111,7 +111,7 @@ worrying about the `None` case.
 Use Option chaining to implement `estimateDelivery`:
 
 {% scalafiddle %}
-```scala mdoc:reset
+```scala mdoc:compile-only
 object OptionExercise {
   case class UserProfile(postcode: Option[String])
 
@@ -126,7 +126,7 @@ object OptionExercise {
   //use flatMap and map
   def estimateDelivery: BigDecimal = ???
 }
-assert(OptionExercise.estimateDelivery = BigDecimal("15.00"))
+assert(OptionExercise.estimateDelivery == BigDecimal("15.00"))
 ```
 {% endscalafiddle %}
 
@@ -163,7 +163,7 @@ the overall value. But otherwise, whatever expression is in the `yield` block is
 Same business logic as the previous exercise, but write it using a for-expression
 
 {% scalafiddle %}
-```scala mdoc:reset
+```scala mdoc:compile-only
 object OptionExercise {
   case class UserProfile(postcode: Option[String])
 
@@ -176,7 +176,7 @@ object OptionExercise {
 
   def estimateDelivery: BigDecimal = ???
 }
-assert(OptionExercise.estimateDelivery = BigDecimal("15.00"))
+assert(OptionExercise.estimateDelivery == BigDecimal("15.00"))
 ```
 {% endscalafiddle %}
 
